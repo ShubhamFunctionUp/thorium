@@ -117,7 +117,7 @@ router.post("/test-post-4", function (req, res) {
     res.send({ msg: arr, status: true })
 })
 
-let arr = [];
+
 router.post("/players", function (req, res) {
 
     let obj = req.body;
@@ -126,7 +126,7 @@ router.post("/players", function (req, res) {
    });
 
    console.log(array);
-   if(array===undefined){
+   if(typeof array==='undefined'){
        players.push(req.body);
        res.send("User Data Insert");
    }else{
@@ -135,9 +135,45 @@ router.post("/players", function (req, res) {
 //    console.log(array==="undefined");
 //    console.log(array);
 //    res.send("Done");
-// console.log(players);
+console.log(players);
 
-})
+});
+
+router.post('/players/:playerName/bookings/:bookingId',function(req,res){
+    let playerName = req.params.playerName;
+    let bookingId = req.params.bookingId;
+    let userBookings = req.body;
+
+    console.log(playerName);
+
+    let playNameCollection = players.find((obj)=>(obj.name===playerName));
+    console.log(playNameCollection);
+    if(playNameCollection === undefined){
+        players.push(req.body);
+        res.send("Inserted succesfully")
+    }else{
+        res.send("Player already exist")
+    }
+
+    for(let i=0;i<players.length;i++){
+        let arr = players[i].bookings;
+        console.log(arr);
+        if(arr.length ===0){
+            arr.push(userBookings);
+            res.send(players);
+        }else{
+            for(let j=0;j<arr.length;j++){
+                if(arr[j].bookingNumber !=bookingId){
+                    arr.push(userBookings);
+                    res.send(players)
+                }else{
+                    res.send("Booking ID already Exists")
+                }
+            }
+        }
+    }
+
+})  
 
 module.exports = router;
 
