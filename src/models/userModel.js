@@ -10,10 +10,12 @@ const userSchema = new mongoose.Schema( {
     },
     emailId: String,
     password: String,
+    
     gender: {
         type: String,
         enum: ["male", "female", "other"]
     },
+    isDeleted:Boolean,
     age: Number,
 }, { timestamps: true });
 
