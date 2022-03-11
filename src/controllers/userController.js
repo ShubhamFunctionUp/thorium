@@ -41,6 +41,7 @@ const loginUser = async function (req, res) {
 };
 
 const getUserData = async function (req, res) {
+ try{
   let token = req.headers["x-Auth-token"];
   if (!token) token = req.headers["x-auth-token"];
 
@@ -64,6 +65,12 @@ const getUserData = async function (req, res) {
     return res.send({ status: false, msg: "No such user exists" });
 
   res.send({ status: true, data: userDetails });
+}catch(err){
+  console.log("This is the error :", err.message)
+  res.status(500).send({ msg: "Error", error: err.message })
+}
+
+
 };
 
 const updateUser = async function (req, res) {
@@ -71,7 +78,7 @@ const updateUser = async function (req, res) {
 // Check if the token is present
 // Check if the token present is a valid token
 // Return a different error message in both these cases
-
+try{
   let userId = req.params.userId;
   let user = await userModel.findById(userId);
   //Return an error if no user with the given id exists in the db
@@ -82,10 +89,18 @@ const updateUser = async function (req, res) {
   let userData = req.body;
   let updatedUser = await userModel.findOneAndUpdate({ _id: userId }, userData);
   res.send({ status: updatedUser, data: updatedUser });
+}
+catch (err) {
+  console.log("This is the error :", err.message)
+  res.status(500).send({ msg: "Error", error: err.message })
+}
+
 };
 
 const postMessage = async function (req, res) {
-    let message = req.body.message
+    
+  try{
+  let message = req.body.message
     // Check if the token is present
     // Check if the token present is a valid token
     // Return a different error message in both these cases
@@ -113,7 +128,13 @@ const postMessage = async function (req, res) {
 
     //return the updated user document
     return res.send({status: true, data: updatedUser})
-}
+  }
+  catch(err){
+    console.log("This is the error :", err.message)
+    res.status(500).send({ msg: "Error", error: err.message })
+  }
+
+  }
 
 module.exports.createUser = createUser;
 module.exports.getUserData = getUserData;
