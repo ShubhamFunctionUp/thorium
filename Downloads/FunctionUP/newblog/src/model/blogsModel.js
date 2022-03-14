@@ -17,11 +17,34 @@ const blogSchema = new mongoose.Schema({
     },
     authorId:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:Author
+        ref:'Author'
     },
     tags:{
         type:[String],
         required:true
+    },
+    category:{
+        type:String,
+        required:true
+    },
+    subcategory:{
+        type:[String]
+    },
+    deletedAt:{
+        type:String,
+        default:""
+    },
+    isDeleted:{
+        type:Boolean,
+        default:false
+    },
+    PublishedAt:{
+        type:String,
+        default:""
+    },
+    isPublished:{
+        type:Boolean,
+        default:false
     }
 
 
@@ -29,4 +52,4 @@ const blogSchema = new mongoose.Schema({
 },{timestamps:true})
 
 
-module.exports = mongoose.model('Author',authorSchema);
+module.exports = mongoose.model('Blog',blogSchema);
