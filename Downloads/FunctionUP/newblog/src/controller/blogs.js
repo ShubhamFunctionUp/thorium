@@ -2,6 +2,9 @@ const blogsmodel = require('../model/blogsModel');
 const authorModel = require('../model/authorModel');
 const moment = require('moment');
 const express = require('express');
+const { update } = require('../model/blogsModel');
+
+// <...........................................................Blog Create............................................................>
 const blogsCreate = async function (req, res) {
 
     try {
@@ -23,9 +26,14 @@ const blogsCreate = async function (req, res) {
     }
 }
 
+
+// <.............................................................Get Blogs.......................................................>
+
+
 const getBlogs = async function (req, res) {
 
     try {
+        
         let data = req.query;
         let filter = {
             isDeleted: false,
@@ -50,6 +58,7 @@ const getBlogs = async function (req, res) {
 
 }
 
+// <.............................................update..........................................>
 
 const updateBlog = async function (req, res) {
 
@@ -83,7 +92,7 @@ const updateBlog = async function (req, res) {
         // console.log("4");
       
         const updatedBlogInLast = await blogsmodel.findByIdAndUpdate(blogId,data,{new:true})
-        console.log(updatedBlogInLast);
+        // console.log(updatedBlogInLast);
         res.status(201).send({ status: true, msg: updatedBlogInLast })
 
     } catch (err) {
@@ -95,6 +104,7 @@ const updateBlog = async function (req, res) {
 
 }
 
+// <.................................Marked Deleted.........................................................>
 const deleteBlog = async function(req,res){
 
     try{  
@@ -107,7 +117,7 @@ const deleteBlog = async function(req,res){
         res.send({status:false,data:err.message})
 }
 }   
-
+// <..........................................................Deleted Blogs......................................>
 const deleteBlogs = async function(req,res){
    try{
     let data = req.query;

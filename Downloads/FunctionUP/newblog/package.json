@@ -4,13 +4,15 @@
   "description": "This is the blogging backend design by room 2",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start":"nodemon src/index.js"
   },
   "author": "Room 2",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.2",
     "express": "^4.17.3",
+    "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
     "mongoose": "^6.2.6"
   }
