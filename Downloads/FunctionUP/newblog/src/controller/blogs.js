@@ -33,7 +33,7 @@ const getBlogs = async function (req, res) {
             ...data,
 
         };
-        console.log(filter);
+        // console.log(filter);
         let blogsPresent = await blogsmodel.find(filter)
 
         if (blogsPresent.length === 0) {
@@ -59,7 +59,7 @@ const updateBlog = async function (req, res) {
         // console.log(blogId);
         // console.log("0");
         let isBlogPresenet = await blogsmodel.findOne({_id:blogId})
-        console.log(isBlogPresenet);
+        // console.log(isBlogPresenet);
        
         if (!isBlogPresenet) {
             res.send({ err: "blog not found" })
@@ -68,18 +68,21 @@ const updateBlog = async function (req, res) {
         if (isBlogPresenet.isDeleted == true) {
             res.status(400).send({ status: false, msg: "this blog is deleted" })
         }
+        
         // console.log("2");
         if (data.isPublished == true) {
             data.PublishedAt = moment().format();
         } else {
             data.PublishedAt = " "
         }
+        console.log(data);
         // console.log("3");
         if (data.isDeleted) {
             data.deletedAt = moment().format()
         }
         // console.log("4");
-        const updatedBlogInLast = await blogsmodel.findOneAndUpdate({ _id: id }, data, { new: true })
+      
+        const updatedBlogInLast = await blogsmodel.findByIdAndUpdate(blogId,data,{new:true})
         console.log(updatedBlogInLast);
         res.status(201).send({ status: true, msg: updatedBlogInLast })
 
