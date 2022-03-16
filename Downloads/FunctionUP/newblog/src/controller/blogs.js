@@ -12,6 +12,7 @@ const blogsCreate = async function (req, res) {
 
         let blogsData = req.body;
         let authorId = req.body.authorId;
+        
         let isAuthorPresent = await authorModel.findById(authorId);
 
         if (!isAuthorPresent) {

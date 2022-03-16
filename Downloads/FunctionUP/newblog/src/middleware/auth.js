@@ -36,9 +36,11 @@ const authorization1 = async function(req,res,next){
     if (!token){
         return res.status(404).send({status: false, msg: "important header is missing"})
     }
+
     const data = req.params
     
     try{
+        
         const blog = await blogsmodel.findById(data.blogId)
         // return res.send({data: blog.authorId})
         const decodeedToken = jwt.verify(token, "Shubham-Auth")
@@ -65,7 +67,7 @@ const authorization2 = async function(req,res,next){
 
     const data = req.query._id;
     try{
-        
+
         const blog = await blogsmodel.findById(data);
         const decodedToken = jwt.verify(token,"Shubham-Auth")
 
