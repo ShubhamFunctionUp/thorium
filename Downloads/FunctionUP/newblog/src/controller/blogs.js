@@ -12,7 +12,7 @@ const blogsCreate = async function (req, res) {
 
         let blogsData = req.body;
         let authorId = req.body.authorId;
-        
+
         let isAuthorPresent = await authorModel.findById(authorId);
 
         if (!isAuthorPresent) {
@@ -111,7 +111,7 @@ const deleteBlog = async function(req,res){
 
     try{  
         let blogsId = req.params.blogId;
-        let blog = await blogsmodel.findOne({_id:blogsId});
+        const blog = await blogsmodel.findOne({_id:blogsId});
         if(!blog){
             res.status(400).send({err:"blog not found"})
         }

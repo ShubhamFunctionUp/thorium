@@ -6,6 +6,7 @@ const authentication = async function(req,res,next){
 
     try{
         let token = req.header["X-Auth-Token"];
+        
         if(!token){
             token = req.headers["x-auth-token"]
           }
@@ -33,6 +34,7 @@ const authentication = async function(req,res,next){
 
 const authorization1 = async function(req,res,next){
     const token = req.headers["x-auth-token"]
+
     if (!token){
         return res.status(404).send({status: false, msg: "important header is missing"})
     }
@@ -40,11 +42,11 @@ const authorization1 = async function(req,res,next){
     const data = req.params
     
     try{
-        
+
         const blog = await blogsmodel.findById(data.blogId)
         // return res.send({data: blog.authorId})
         const decodeedToken = jwt.verify(token, "Shubham-Auth")
-        console.log(decodeedToken.authorId + " " + blog.authorId);
+        // console.log(decodeedToken.authorId + " " + blog.authorId);
 
         if(decodeedToken.authorId == blog.authorId){
             next()
