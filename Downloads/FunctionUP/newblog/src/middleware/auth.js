@@ -42,7 +42,8 @@ const authorization1 = async function(req,res,next){
         const blog = await blogsmodel.findById(data.blogId)
         // return res.send({data: blog.authorId})
         const decodeedToken = jwt.verify(token, "Shubham-Auth")
-        console.log(decodeedToken);
+        console.log(decodeedToken.authorId + " " + blog.authorId);
+
         if(decodeedToken.authorId == blog.authorId){
             next()
         }else{
@@ -57,19 +58,21 @@ const authorization1 = async function(req,res,next){
 }
 
 const authorization2 = async function(req,res,next){
-    const token = req.header["x-auth-token"]
+    const token = req.headers["x-auth-token"]
     if(!token){
         res.status(404).send({status:false,msg:"important header is missing"})
     }
 
-    const data = req.query;
+    const data = req.query._id;
     try{
-        const blog = await blogsmodel.findOne(data);
+        
+        const blog = await blogsmodel.findById(data);
         const decodedToken = jwt.verify(token,"Shubham-Auth")
-        if(decodedToken.id==blog.authorId){
+
+        if(decodedToken.authorId==blog.authorId){
             next();
         }else{
-            req.status(404).send({status:false,msg:"you are not autorized"})
+            res.status(404).send({status:false,msg:"you are not autorized"})
         }
     
     }catch(err){

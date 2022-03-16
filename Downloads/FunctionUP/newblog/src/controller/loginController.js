@@ -14,7 +14,7 @@ const loginAuthor = async function(req,res){
 
     let token = jwt.sign({
         authorId:isAuthorPresent._id.toString(),
-        batch:"Blog Project"
+        fullName:`${isAuthorPresent.fName} ${isAuthorPresent.lName}`
     },"Shubham-Auth");
 
     res.setHeader("x-auth-token",token)

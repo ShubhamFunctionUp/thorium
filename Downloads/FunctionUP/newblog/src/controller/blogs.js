@@ -2,7 +2,8 @@ const blogsmodel = require('../model/blogsModel');
 const authorModel = require('../model/authorModel');
 const moment = require('moment');
 const express = require('express');
-const { update } = require('../model/blogsModel');
+const { update, findOneAndUpdate } = require('../model/blogsModel');
+const blogsModel = require('../model/blogsModel');
 
 // <...........................................................Blog Create............................................................>
 const blogsCreate = async function (req, res) {
@@ -109,8 +110,18 @@ const deleteBlog = async function(req,res){
 
     try{  
         let blogsId = req.params.blogId;
-        let present = await blogsmodel.findOneAndUpdate({$and:[{_id:blogsId},{isDeleted:false}],$set:{isDeleted:true},new:true})
-        res.status(200).send({})
+        let blog = await blogsmodel.findOne({_id:blogsId});
+        if(!blog){
+            res.status(400).send({err:"blog not found"})
+        }
+
+        if(blog.isDeleted==true){
+            res.status(400).send({status:false,msg:"this blog is already deleted"})
+        }
+
+        const deletedBlog = await blogsmodel.findOneAndUpdate({_id:blogsId},{isDeleted:true,deletedAt:moment().format()},{new:true})
+
+        res.status(200).send({msg:deletedBlog})
 
     }
     catch(err){
@@ -121,13 +132,20 @@ const deleteBlog = async function(req,res){
 const deleteBlogs = async function(req,res){
    try{
     let data = req.query;
-    let filter = {
-        isPublished:false,
-        ...data};
-    let findBlogs = await blogsmodel.findOneAndDelete(filter);
-    res.send({msg:findBlogs})
+   const blog = await blogsmodel.findOne(data);
+   if(!blog){
+       res.status(400).send({err:"blog not found"})
+   }
+
+   if(blog.isDeleted==true){
+       res.status(400).send({status:false,msg:"This blog is deleted already"})
+   }
+
+   const deletedlBlog = await blogsModel.findOneAndUpdate(data,{isDeleted:true,deletedAt:moment().format()},{new:true})
+
+    res.send({msg:deletedlBlog})
    }catch(err){
-       res.status(404).send({status:false,msg:""})
+       res.status(404).send({status:false,msg:err.message})
    }
 }
 
