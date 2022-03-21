@@ -5,6 +5,7 @@ const authorCreate = async function (req,res){
     try{
     let content = req.body;
     let email = req.body.email;
+    
     if(emailvalidator.validate(email)){
         let filter = {
             ...content

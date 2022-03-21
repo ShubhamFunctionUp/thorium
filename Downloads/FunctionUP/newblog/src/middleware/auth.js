@@ -5,7 +5,7 @@ const authorModel = require('../model/authorModel');
 const authentication = async function(req,res,next){
 
     try{
-        let token = req.header["X-Auth-Token"];
+        let token = req.headers["X-Auth-Token"];
         
         if(!token){
             token = req.headers["x-auth-token"]

@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken')
 
 const loginAuthor = async function(req,res){
    try{
+       
     let authorEmail = req.body.email;
     let authorpassword = req.body.password;
     

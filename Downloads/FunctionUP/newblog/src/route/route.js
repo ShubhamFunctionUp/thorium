@@ -17,5 +17,5 @@ router.post('/blogs',blogsController.blogsCreate);
 router.get('/blogs',middleware.authentication,blogsController.getBlogs);
 router.put('/blogs/:blogId',middleware.authentication,middleware.authorization1,blogsController.updateBlog);
 router.delete('/blogs/:blogId',middleware.authentication,middleware.authorization1,blogsController.deleteBlog);
-router.delete('/blogs',middleware.authentication,middleware.authorization2,blogsController.deleteBlogs)
+router.delete('/blogs',middleware.authentication,middleware.authorization2,blogsController.deleteBlogx)
 module.exports = router;

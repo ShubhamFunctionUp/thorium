@@ -6,6 +6,7 @@ const { update, findOneAndUpdate } = require('../model/blogsModel');
 const blogsModel = require('../model/blogsModel');
 
 // <...........................................................Blog Create............................................................>
+
 const blogsCreate = async function (req, res) {
 
     try {
@@ -35,7 +36,7 @@ const blogsCreate = async function (req, res) {
 const getBlogs = async function (req, res) {
 
     try {
-        
+
         let data = req.query;
         let filter = {
             isDeleted: false,
@@ -69,9 +70,9 @@ const updateBlog = async function (req, res) {
         let blogId = req.params.blogId;
         // console.log(blogId);
         // console.log("0");
-        let isBlogPresenet = await blogsmodel.findOne({_id:blogId})
+        let isBlogPresenet = await blogsmodel.findOne({ _id: blogId })            //only fetch that while which required
         // console.log(isBlogPresenet);
-       
+
         if (!isBlogPresenet) {
             res.send({ err: "blog not found" })
         }
@@ -79,12 +80,12 @@ const updateBlog = async function (req, res) {
         if (isBlogPresenet.isDeleted == true) {
             res.status(400).send({ status: false, msg: "this blog is deleted" })
         }
-        
+
         // console.log("2");
         if (data.isPublished == true) {
             data.PublishedAt = moment().format();
         } else {
-            data.PublishedAt = " "
+            data.PublishedAt = ""
         }
         console.log(data);
         // console.log("3");
@@ -92,8 +93,8 @@ const updateBlog = async function (req, res) {
             data.deletedAt = moment().format()
         }
         // console.log("4");
-      
-        const updatedBlogInLast = await blogsmodel.findByIdAndUpdate(blogId,data,{new:true})
+
+        const updatedBlogInLast = await blogsmodel.findByIdAndUpdate(blogId, data, { new: true })
         // console.log(updatedBlogInLast);
         res.status(201).send({ status: true, msg: updatedBlogInLast })
 
@@ -106,51 +107,58 @@ const updateBlog = async function (req, res) {
 
 }
 
+const deleteBlogx = async (req, res) => {
+    try {
+        let data = req.query;
+        const blog = await blogsmodel.findOne(data);
+        console.log(blog);
+        if (!blog) {
+            res.status(400).send({ err: "blog not found" })
+        }
+
+        if (blog.isDeleted == true) {
+            return res.status(400).send({ status: false, msg: "This blog is deleted already" })
+        }
+
+        const deletedlBlog = await blogsModel.findOneAndUpdate(data, { isDeleted: true, deletedAt: moment().format() }, { new: true })
+        console.log(deletedlBlog);
+        //    return res.status(400).send({msg:deletedlBlog})
+        return res.status(400).send({ status: false, msg: "This blog is deleted already" })
+        return;
+        console.log("149");
+    } catch (err) {
+        console.log(err);
+        res.status(404).send({ status: false, msg: err.message })
+    }
+}
+
+
 // <.................................Marked Deleted.........................................................>
-const deleteBlog = async function(req,res){
+const deleteBlog = async function (req, res) {
 
-    try{  
+    try {
         let blogsId = req.params.blogId;
-        const blog = await blogsmodel.findOne({_id:blogsId});
-        if(!blog){
-            res.status(400).send({err:"blog not found"})
+        const blog = await blogsmodel.findOne({ _id: blogsId });
+        if (!blog) {
+            res.status(400).send({ err: "blog not found" })
         }
 
-        if(blog.isDeleted==true){
-            res.status(400).send({status:false,msg:"this blog is already deleted"})
+        if (blog.isDeleted == true) {
+            res.status(400).send({ status: false, msg: "this blog is already deleted" })
         }
 
-        const deletedBlog = await blogsmodel.findOneAndUpdate({_id:blogsId},{isDeleted:true,deletedAt:moment().format()},{new:true})
+        const deletedBlog = await blogsmodel.findOneAndUpdate({ _id: blogsId }, { isDeleted: true, deletedAt: moment().format() }, { new: true })
 
-        res.status(200).send({msg:deletedBlog})
+        res.status(200).send({ msg: deletedBlog })
 
     }
-    catch(err){
-        res.send({status:false,data:err.message})
+    catch (err) {
+        res.send({ status: false, data: err.message })
+    }
 }
-}   
 // <..........................................................Deleted Blogs......................................>
-const deleteBlogs = async function(req,res){
-   try{
-    let data = req.query;
-   const blog = await blogsmodel.findOne(data);
-   if(!blog){
-       res.status(400).send({err:"blog not found"})
-   }
 
-   if(blog.isDeleted==true){
-       res.status(400).send({status:false,msg:"This blog is deleted already"})
-   }
-
-   const deletedlBlog = await blogsModel.findOneAndUpdate(data,{isDeleted:true,deletedAt:moment().format()},{new:true})
-
-    res.send({msg:deletedlBlog})
-   }catch(err){
-       res.status(404).send({status:false,msg:err.message})
-   }
-}
-
-module.exports.deleteBlogs = deleteBlogs;
+module.exports.deleteBlogx = deleteBlogx;
 module.exports.deleteBlog = deleteBlog;
 module.exports.getBlogs = getBlogs;
 module.exports.updateBlog = updateBlog;
