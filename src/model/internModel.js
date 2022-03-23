@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 // { name: {mandatory}, email: {mandatory, valid email, unique},
 //  mobile: {mandatory, valid mobile number, unique}, collegeId: {ObjectId, ref to college model, isDeleted: {boolean, default: false}}
+// let stringRegex = "^(?:(?:\+|0{0,2})91(\s*[\ -]\s*)?|[0]?)?[456789]\d{9}|(\d[ -]?){10}\d$";
+
 
 const internModel = new mongoose.Schema({
     name:{
@@ -15,14 +17,16 @@ const internModel = new mongoose.Schema({
         unique:true
     },
     mobile:{
-        type:String,
+        type:String ,
         unique:true,
         // Validation is required
-        required:true
+        required:true,
+        match:[/^[6-9]\d{9}$/]
     },
     collegeId:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'College'
+        ref:'College',
+        required:[true,"college id is required"]
     },
     isDeleted:{
         type:Boolean,
