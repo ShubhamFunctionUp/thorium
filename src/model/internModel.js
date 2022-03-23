@@ -21,7 +21,7 @@ const internModel = new mongoose.Schema({
         unique:true,
         // Validation is required
         required:true,
-        match:[/^[6-9]\d{9}$/]
+        match:[/^[6-9]\d{9}$/,"Invalid number"]
     },
     collegeId:{
         type:mongoose.Schema.Types.ObjectId,
@@ -35,3 +35,4 @@ const internModel = new mongoose.Schema({
 },{timeStamp:true})
 
 module.exports = mongoose.model('Intern',internModel)
+

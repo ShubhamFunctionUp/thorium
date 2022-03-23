@@ -45,10 +45,14 @@ try{
      }
  
      let phonePresent = await internModel.findOne({mobile:mobile})
-
+   
      if(phonePresent!=null){
          return res.status(400).send({msg:"phone number is duplicate"})
      }
+     
+     if(mobile.length<10){
+        return res.status(400).send({status:false,msg:"please enter 10 digit"})
+    }
 
      let collegePresent = await collegeModel.findById(collegeId);
      // console.log(collegePresent)
