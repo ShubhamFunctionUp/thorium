@@ -3,7 +3,7 @@ const collegeModel = require('../model/collegeModel');
 const emailvalidator = require("email-validator");
 const createIntern = async function(req,res){
     let data = req.body;
-    let {isDeleted,collegeId,name,email} = data;  
+    let {isDeleted,collegeId,name,email,mobile} = data;  
 try{
     
     if(Object.keys(data).length===0){
@@ -14,13 +14,42 @@ try{
     //  if(mobile.length<10){
     //      res.status(400).send({status:false,msg:"Phone number is else then 10"})
     //  }
+    if(name===""){
+      return  res.status(400).send({msg:"name is not defined"});
+    }
+
+    if(email===""){
+       return res.status(400).send({msg:"email is not defined"});
+    }
+
+    if(collegeId===""){
+     return   res.status(400).send({msg:"collegeId is not defined"});
+    }
+    
+    if(mobile===""){
+        return   res.status(400).send({msg:"mobile is not defined"});
+       }
  
+//    
+
+
      if(emailvalidator.validate(email)){
  
      if(isDeleted===true){
          return res.status(400).send({status:false,msg:"Data is already deleted"});
      }
+     let emailPresent =  await internModel.findOne({email:email})
+   
+     if(emailPresent!=null){
+         return res.status(400).send({msg:"email is already present "});
+     }
  
+     let phonePresent = await internModel.findOne({mobile:mobile})
+
+     if(phonePresent!=null){
+         return res.status(400).send({msg:"phone number is duplicate"})
+     }
+
      let collegePresent = await collegeModel.findById(collegeId);
      // console.log(collegePresent)
      if(!collegePresent){
@@ -34,12 +63,12 @@ try{
      }
  
      let createIntern = await internModel.create(data);
-     return res.status(200).send({status:true,data:createIntern});
+     return res.status(201).send({status:true,data:createIntern});
      }else{
          res.status(400).send({msg:"invalid email"})
      }
 }catch(err){
-    res.status(400).send({status:false,msg:err.message})
+    res.status(500).send({status:false,msg:err.message})
 }
 }
 
