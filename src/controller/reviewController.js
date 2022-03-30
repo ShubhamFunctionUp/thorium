@@ -5,7 +5,7 @@ const reviewModel = require('../models/reviewModel');
 
 const createReview = async function (req, res) {
     let bookId = req.params.bookId;
-    if (bookId == "") {
+    if (bookId == "" || typeof(bookId)==undefined || typeof(bookId)==null) {
         return res.send({
             msg: "Please pass bookId in url"
         })
