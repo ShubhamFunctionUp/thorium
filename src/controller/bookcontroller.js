@@ -50,7 +50,7 @@ const findBook = async function (req, res) {
         let isNotDeleted = await bookModel.find({
             isDeleted: false
         }).select({
-            book_id: 1,
+            _id: 1,
             title: 1,
             excerpt: 1,
             userId: 1,
@@ -102,7 +102,10 @@ const getBookById = async function (req, res) {
     let reviews = await reviewModel.find({
         bookId: bookparameter,
         isDeleted: false
-    }).select({createdAt:0,updatedAt:0});
+    }).select({
+        createdAt: 0,
+        updatedAt: 0
+    });
     if (reviews.length > 0) {
         copyOfBook.reviewsData = reviews;
     }
@@ -156,7 +159,7 @@ const deleteBook = async function (req, res) {
     }
     let bookIdIsPresent = await bookModel.findOne({
         _id: bookParameter,
-        isDeleted: false
+        isDeleted: true
     });
 
     if (bookIdIsPresent == null) {
@@ -166,12 +169,23 @@ const deleteBook = async function (req, res) {
 
     }
 
+
     let deletedBook = await bookModel.findByIdAndUpdate(bookParameter, {
         isDeleted: true,
         deletedAt: new Date()
     }, {
         new: true
     })
+
+    const deleteReview = await reviewModel.updateMany({
+        bookId: bookParameter
+    }, {
+        isDeleted: true
+    }, {
+        new: true
+    })
+
+
     return res.send({
         msg: deletedBook
     });

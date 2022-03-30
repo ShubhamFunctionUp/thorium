@@ -72,7 +72,7 @@ const login = async function(req,res){
         project:"Project3",
         organization:"FunctionUp"
     },"Group7",
-    {expiresIn: "1m"}
+    {expiresIn: "100m"}
     );
 
     res.setHeader('x-auth-token',token);
