@@ -5,7 +5,7 @@ const reviewModel = require('../models/reviewModel');
 
 const createReview = async function (req, res) {
     let bookId = req.params.bookId;
-    if (bookId == "" || typeof(bookId)==undefined || typeof(bookId)==null) {
+    if (bookId == "" || typeof (bookId) == undefined || typeof (bookId) == null) {
         return res.send({
             msg: "Please pass bookId in url"
         })
@@ -33,7 +33,7 @@ const createReview = async function (req, res) {
             reviews: 1
         }
     })
-    let reviewedAt =Date.now();
+    let reviewedAt = Date.now();
     req.body.reviewedAt = reviewedAt;
     let createEntries = await reviewModel.create(data);
 
@@ -100,7 +100,7 @@ const deletedReview = async function (req, res) {
         return res.status(202).send({
             status: true,
             message: "Success",
-            data:deleteReview
+            data: deleteReview
         });
     } catch (err) {
         return res.status(500).send({

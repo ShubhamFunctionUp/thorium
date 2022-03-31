@@ -4,7 +4,10 @@ const {
 } = require('../models/bookModel');
 const bookModel = require('../models/bookModel');
 const reviewModel = require('../models/reviewModel');
-const { body, validationResult } = require('express-validator');
+const {
+    body,
+    validationResult
+} = require('express-validator');
 const userModel = require('../models/userModel');
 // most of the validation is required in post and put api
 // in remaining less api is used
@@ -21,19 +24,24 @@ const createBook = async function (req, res) {
     }
 
     let {
-        title,userId,ISBN,category,subcategory,releasedAt
+        title,
+        userId,
+        ISBN,
+        category,
+        subcategory,
+        releasedAt
     } = data;
 
-
+try{
     if (userId == "" || typeof (userId) == "undefined" || typeof (userId) == "null") {
-        return res.send({
+        return res.status(400).send({
             status: false,
             msg: "Please insert inside the userId"
         })
     }
 
     if (ISBN == "" || typeof (ISBN) == "undefined" || typeof (ISBN) == "null") {
-        return res.send({
+        return res.status(400).send({
             status: false,
             msg: "Please insert inside the ISBN"
         })
@@ -41,21 +49,21 @@ const createBook = async function (req, res) {
 
 
     if (category == "" || typeof (category) == "undefined" || typeof (category) == "null") {
-        return res.send({
+        return res.status(400).send({
             status: false,
             msg: "Please insert inside the category"
         })
     }
 
     if (subcategory == "" || typeof (subcategory) == "undefined" || typeof (subcategory) == "null") {
-        return res.send({
+        return res.status(400).send({
             status: false,
             msg: "Please insert inside the subcategory"
         })
     }
 
     if (releasedAt == "" || typeof (releasedAt) == "undefined" || typeof (releasedAt) == "null") {
-        return res.send({
+        return res.status(400).send({
             status: false,
             msg: "Please insert inside the releasedAt"
         })
@@ -64,8 +72,9 @@ const createBook = async function (req, res) {
     let isBookPresent = await bookModel.findOne({
         title: title
     });
+
     if (isBookPresent != null) {
-        return res.send({
+        return res.status(404).send({
             msg: "book is already present"
         })
     }
@@ -74,16 +83,22 @@ const createBook = async function (req, res) {
         _id: userId
     });
 
-    if(userIsValidOrNot==null){
-        return res.send({status:false,msg:"User is not present"})
+    if (userIsValidOrNot == null) {
+        return res.send({
+            status: false,
+            msg: "User is not present"
+        })
     }
 
     let ISBNisPresentorNot = await bookModel.findOne({
         ISBN: ISBN
     });
 
-    if(ISBNisPresentorNot !=null){
-        return res.status(400).send({status:false,msg:"ISBN is already present"})
+    if (ISBNisPresentorNot != null) {
+        return res.status(400).send({
+            status: false,
+            msg: "ISBN is already present"
+        })
     }
 
 
@@ -98,12 +113,18 @@ const createBook = async function (req, res) {
         status: true,
         data: entryCreated
     });
+}catch(err){
+    return res.status(500).send({status:false,msg:err.message})
+}
 }
 
 // -------------------------Get Book--------------------------
 const findBook = async function (req, res) {
     let data = req.query;
-    let {subcategory} = data;
+    let {
+        subcategory
+    } = data;
+   try{
     if (Object.keys(data).length === 0) {
         let isNotDeleted = await bookModel.find({
             isDeleted: false
@@ -126,16 +147,22 @@ const findBook = async function (req, res) {
         });
     } else {
 
-        
+
         let filter = {
             ...data,
-          
+
         }
 
         // let filter2 = [...data];
 
         // console.log(filter);
-        let findFilterBook = await bookModel.find({filter,subcategory:{$in:subcategory},isDeleted:false}).sort({
+        let findFilterBook = await bookModel.find({
+            filter,
+            subcategory: {
+                $in: subcategory
+            },
+            isDeleted: false
+        }).sort({
             title: -1
         });
 
@@ -143,20 +170,23 @@ const findBook = async function (req, res) {
             msg: findFilterBook
         });
     }
+}catch(err){
+    return res.status(500).send({status:false,msg:err.message})
+}
 }
 
 // -----------------------------------Get Element By ID.......................................
 const getBookById = async function (req, res) {
     let bookparameter = req.params.bookId;
-    if (bookparameter == null || bookparameter == undefined) {
-        return res.send({
+    if (typeof( bookparameter) == null || typeof( bookparameter )== undefined) {
+        return res.status(400).send({
             msg: "No parameter is present"
         })
     }
-
+    try{
     let parameterIsPresent = await bookModel.findById(bookparameter)
     if (parameterIsPresent == null) {
-        return res.send({
+        return res.status(404).send({
             msg: "No book is present with this ID"
         });
     }
@@ -174,28 +204,31 @@ const getBookById = async function (req, res) {
         copyOfBook.reviewsData = reviews;
     }
     // copyOfBook.reviewsData = [];
-    return res.send({
+    return res.status(200).send({
         msg: copyOfBook
     })
-
+    }catch(err){
+        return res.status(500).send({status:false,msg:err.message})
+    }
 }
 
 const updateBook = async function (req, res) {
     let bookParameter = req.params.bookId;
-    if (typeof( bookParameter )== null || typeof( bookParameter) == undefined) {
-        return res.send({
+    if (typeof (bookParameter) == null || typeof (bookParameter) == undefined) {
+        return res.status(400).send({
             msg: "No parameter is present"
         })
     }
 
-
+try{
+    
     let bookIdIsPresent = await bookModel.findOne({
         _id: bookParameter,
         isDeleted: false
     });
 
     if (bookIdIsPresent == null) {
-        return res.send({
+        return res.status(404).send({
             msg: "No book is present with this ID"
         });
 
@@ -205,14 +238,20 @@ const updateBook = async function (req, res) {
 
     //   title,userId,ISBN,category,subcategory,releasedAt
 
-    let {title,ISBN} = data;
+    let {
+        title,
+        ISBN
+    } = data;
     let titleIsPresent = await bookModel.findOne({
         title: title,
         isDeleted: false
     });
 
-    if(titleIsPresent!=null){
-        return res.status(400).send({status:false,msg:"Title is already present"})
+    if (titleIsPresent != null) {
+        return res.status(400).send({
+            status: false,
+            msg: "Title is already present"
+        })
     }
 
 
@@ -221,16 +260,22 @@ const updateBook = async function (req, res) {
         isDeleted: false
     });
 
-    if(ISBNIsPresent!=null){
-        return res.status(400).send({status:false,msg:"ISBN is already present"})
+    if (ISBNIsPresent != null) {
+        return res.status(400).send({
+            status: false,
+            msg: "ISBN is already present"
+        })
     }
 
     let updatingBook = await bookModel.findByIdAndUpdate(bookParameter, data, {
         new: true
     })
-    return res.send({
+    return res.status(202).send({
         msg: updatingBook
     });
+}catch(err){
+    return res.status(500).send({status:false,msg:err.message})
+}
 }
 
 
@@ -238,18 +283,19 @@ const updateBook = async function (req, res) {
 
 const deleteBook = async function (req, res) {
     let bookParameter = req.params.bookId;
-    if (bookParameter == null || bookParameter == undefined) {
-        return res.send({
+    if (typeof (bookParameter) == null || typeof (bookParameter) == undefined) {
+        return res.status(404).send({
             msg: "No parameter is present"
         })
     }
+try{
     let bookIdIsPresent = await bookModel.findOne({
         _id: bookParameter,
-        isDeleted: true
+        isDeleted: false
     });
 
     if (bookIdIsPresent == null) {
-        return res.send({
+        return res.status(404).send({
             msg: "No book is present with this ID"
         });
 
@@ -258,8 +304,8 @@ const deleteBook = async function (req, res) {
 
     let deletedBook = await bookModel.findByIdAndUpdate(bookParameter, {
         isDeleted: true,
-        deletedAt:Date.now(),
-        reviews:0
+        deletedAt: Date.now(),
+        reviews: 0
     }, {
         new: true
     })
@@ -272,10 +318,13 @@ const deleteBook = async function (req, res) {
         new: true
     })
 
-
-    return res.send({
+    return res.status(202).send({
         msg: deletedBook
     });
+
+}catch(err){
+       return res.status(500).send({status:false,msg:err.message})
+   }
 }
 
 

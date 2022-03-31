@@ -10,6 +10,7 @@ const createUser = async function (req, res) {
             msg: "Please insert data"
         });
     }
+
     let {
         title,
         name,
@@ -18,6 +19,7 @@ const createUser = async function (req, res) {
         address,
         phone
     } = data;
+   
     let {
         street,
         city,
@@ -29,61 +31,61 @@ const createUser = async function (req, res) {
     // if(body('email').isEmail())
     console.log(title);
     if (title == "" || typeof (title) == "undefined" || typeof (title) == "null") {
-        return res.send({
+        return res.status(400).send({
             status: false,
             msg: "Please insert inside the title"
         })
     }
     if (name == "" || typeof (name) == "undefined" || typeof (name) == "null") {
-        return res.send({
+        return res.status(400).send({
             status: false,
             msg: "Please insert inside the name"
         })
     }
     if (email == "" || typeof (email) == "undefined" || typeof (email) == "null") {
-        return res.send({
+        return res.status(400).send({
             status: false,
             msg: "Please insert inside the email"
         })
     }
     if (password == "" || typeof (password) == "undefined" || typeof (password) == "null") {
-        return res.send({
+        return res.status(400).send({
             status: false,
             msg: "Please insert inside the password"
         })
     }
     if (street == "" || typeof (street) == "undefined" || typeof (street) == "null") {
-        return res.send({
+        return res.status(400).send({
             status: false,
             msg: "Please insert inside the street"
         })
     }
     if (city == "" || typeof (city) == "undefined" || typeof (city) == "null") {
-        return res.send({
+        return res.status(400).send({
             status: false,
             msg: "Please insert inside the city"
         })
     }
     if (pincode == "" || typeof (pincode) == "undefined" || typeof (pincode) == "null") {
-        return res.send({
+        return res.status(400).send({
             status: false,
             msg: "Please insert inside the pincode"
         })
     }
     if (phone == "" || typeof (phone) == "undefined" || typeof (phone) == "null") {
-        return res.send({
+        return res.status(400).send({
             status: false,
             msg: "Please insert inside the phone"
         })
     }
     if (phone.length === "10") {
-        return res.send({
+        return res.status(400).send({
             msg: "Please enter 10 digit Number"
         });
     }
 
     if (!/^([a-z0-9\.-]+)@([a-z-]+).([a-z]+)$/.test(email)) {
-        return res.send({
+        return res.status(400).send({
             msg: "Please enter valid email"
         })
     }
@@ -95,7 +97,7 @@ const createUser = async function (req, res) {
         })
     }
 
-    if (! /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/.test(password)) {
+    if (!/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/.test(password)) {
         return res.status(400).send({
             status: false,
             msg: "Please enter Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character"
@@ -105,6 +107,7 @@ const createUser = async function (req, res) {
     let emailPresent = await userModel.findOne({
         email: email
     })
+
     if (emailPresent != null) {
         return res.status(409).send({
             msg: "Email is already present"
@@ -115,14 +118,14 @@ const createUser = async function (req, res) {
         phone: phone
     })
     if (phonePresent != null) {
-        return res.send({
+        return res.status(409).send({
             msg: "phonee is already present"
         });
     }
 
 
     let successFullyInserted = await UserModel.create(data);
-    res.send({
+    res.status(201).send({
         status: true,
         msg: successFullyInserted
     })
@@ -132,7 +135,7 @@ const createUser = async function (req, res) {
 const login = async function (req, res) {
     let data = req.body;
     if (Object.keys(data).length == 0) {
-        return res.send({
+        return res.status(404).send({
             status: false,
             msg: "Please insert data"
         });
@@ -180,8 +183,8 @@ const login = async function (req, res) {
     });
 
     res.setHeader('x-auth-token', token);
-    return res.send({
-        status: false,
+    return res.status(201).send({
+        status: true,
         msg: token
     });
 
