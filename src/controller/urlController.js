@@ -75,7 +75,7 @@ const createUrlShorter = async function (req, res) {
 
            let url = await urlModel.findOne({longUrl:longUrl}).select({"createdAt":0,"updatedAt":0,"__v":0,"_id":0})
                if(url){
-                   return res.status(409).send({status:false,msg:"Already Present",data:url})
+                   return res.status(200).send({status:true,data:url})
                }else{
          //   // const urlCode = shortid.generate().toLowerCase();
 
