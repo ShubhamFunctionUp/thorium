@@ -119,6 +119,7 @@ const createUrlShorter = async function (req, res) {
                         shortUrl: shortUrl,
                         urlCode: urlCode
                     }
+                    await SET_ASYNC(`${urlCode}`, JSON.stringify(longUrl)); // save also in caching memory 
 
                     res.status(201).send({
                         status: true,
