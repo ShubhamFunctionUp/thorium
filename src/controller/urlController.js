@@ -155,20 +155,20 @@ const getUrlCode = async function (req, res) {
 
     try {
 
-        // let urlCodeIsPresent = await urlModel.findOne({
-        //     urlCode: urlCode
-        // })
-        // // null is falsy value and in if condition it takes only true value so 
-        // // when nothing is present it will give null and that is falsy so ! is reverse
-        // // logic part to true move inside the code
+        let urlCodeIsPresent = await urlModel.findOne({
+            urlCode: urlCode
+        })
+        // null is falsy value and in if condition it takes only true value so 
+        // when nothing is present it will give null and that is falsy so ! is reverse
+        // logic part to true move inside the code
 
 
-        // if (!urlCodeIsPresent) {
-        //     return res.status(404).send({
-        //         status: false,
-        //         msg: "Url is not present"
-        //     });
-        // }
+        if (!urlCodeIsPresent) {
+            return res.status(404).send({
+                status: false,
+                msg: "Url is not present"
+            });
+        }
         // console.log(urlCodeIsPresent.longUrl, urlCodeIsPresent.shortUrl);
         // return res.status(301).redirect(urlCodeIsPresent.longUrl)
         // return res.send({status:true,data:urlCodeIsPresent.longUrl})
