@@ -93,43 +93,82 @@ const validator = require('../validator/validator');
 
 const getProducts = async function(req,res){
     let requestQuery = req.query;
-    let obj = {};
-    if(Object.keys(requestQuery).length===0){
-        let allUndeletedProduct = await ProductModel.find({isDeleted:false});
-        return res.status(200).send({status:true,msg:"Success",data:allUndeletedProduct})
-    }else{
-        // Size ,Product Name substring ,price
-        let {size,ProductName,priceGreaterThan,priceLessThan}  = req.query;
-        if (validator.isValid(size)) {
-            obj.size = size
-        }
-        // if (validator.isValid(ProductName) ){
-        //     obj.ProductName
-        // }
+    try {
         
-
-        if(validator.isValid(priceGreaterThan)){
-            let calculate = {
-                price:{$gt:parseInt(priceGreaterThan)}
-            }
-            obj.price = calculate
+        let obj = {
+            isDeleted:false
         }
 
-        if(validator.isValid(priceLessThan)){
-            let calculate = {
-                price:{$lt:priceLessThan}
-            }
-            obj.priceL = calculate
+        let availableSizes = requestQuery.availableSizes;
+        if(availableSizes){
+        if(!validator.isValid(availableSizes) && availableSizes.length===0){
+            return res.status(400).send({status:false,msg:"Please enter size"})
+        }else{
+            obj.availableSizes ={$in:availableSizes};
         }
-
-        let findDetails = await ProductModel.find({...obj});
-
-
-
-        return res.status(400).send({status:false,message:"Success",data:findDetails})
-
     }
 
+        let name = requestQuery.name;
+        if(name){
+        if (!validator.isValid(name)) {
+            return res.status(400).send({status:false,mesage:"please enter valid name"})
+        } else {
+            //    $regex is given by mongodb it will return whatever data pattern
+            obj.title = {$regex:name};
+         }
+        }
+    
+        let priceGreaterThan = req.query.priceGreaterThan;
+        if(priceGreaterThan){
+            if(!validator.isValid(priceGreaterThan)){
+                return res.status(400).send({status:false,message:"Please enter price"})
+            }else{
+                obj.price = {$gte:priceGreaterThan}
+            }
+        }
+
+        let priceLessThan = req.query.priceLessThan;
+        if(priceLessThan){
+            if(!validator.isValid(priceLessThan)){
+                return res.status(400).send({status:false,msg:"Please enter the pricelessthan"})
+            }else{
+                obj.price = {$lte:priceLessThan}
+            }
+        }
+
+        if(priceGreaterThan && priceLessThan){
+            if(!validator.isValid(priceLessThan)){
+                return res.status(400).send({status:false,message:"Please enter price less than"})
+            }
+            if(!validator.isValid(priceGreaterThan)){
+                return res.status(400).send({status:false,message:"Please enter greater price"})
+           
+            }
+
+            obj.price = {$lte:priceLessThan,$gte:priceGreaterThan}
+        }
+
+        let priceSort = requestQuery.priceSort;
+        if(priceSort){
+        if(priceSort==="lessToMore"){
+            priceSort = 1;
+        }else if(priceSort==="moreToLess"){
+            priceSort = -1;
+        }
+    }
+    console.log(obj);
+        let filterProduct = await ProductModel.find(obj).sort({price:priceSort})
+
+        if(filterProduct.length==0){
+            return res.status(400).send({status:true,message:"No product Found"});
+        }
+
+        return res.status(200).send({status:true,message:"Products you want",data:filterProduct})
+        
+
+    } catch (error) {
+        return res.status(500).send({status:false,msg:error.message})
+    }
 }
 
 
