@@ -256,7 +256,7 @@ const updateProductById = async function (req, res) {
         const data = req.body
         const productId = req.params.productId
 
-        const checkProductId = await productModel.findOne({ _id: productId, isDeleted: false })
+        const checkProductId = await ProductModel.findOne({ _id: productId, isDeleted: false })
 
         if (!checkProductId) {
             return res.status(404).send({ status: false, msg: "Invalid product id" })
@@ -267,12 +267,12 @@ const updateProductById = async function (req, res) {
 
         const files = req.files
 
-        if (validator.isValidfiles(files)) {
-            const productImage = await awsS3.uploadFile(files[0])
+        if (files) {
+            const productImage = await awsFile.uploadFile(files[0])
             updateProductInfo.productImage = productImage
         }
         if (validator.isValid(title)) {
-            const isTitleAlreadyUsed = await productModel.findOne({ title: title });
+            const isTitleAlreadyUsed = await ProductModel.findOne({ title: title });
             if (isTitleAlreadyUsed) {
                 return res.status(400).send({ status: false, msg: "title already exist" })
             }
@@ -314,9 +314,9 @@ const updateProductById = async function (req, res) {
             //let newsize = availableSizes.split(" ").length
 
             //converting string into array-
-            let SavailableSizes = availableSizes.split(" ")
+            let SavailableSizes = availableSizes.split(",")
             //console.log(newsize)
-            for (let i = 0; i < availableSizes.split(" ").length; i++) {
+            for (let i = 0; i < availableSizes.split(",").length; i++) {
                 // console.log(availableSizes[i])
                 array.push(SavailableSizes[i].toUpperCase())
                 if (!(["S", "XS", "M", "X", "L", "XXL", "XL"].includes(array[i]))) {
@@ -335,7 +335,7 @@ const updateProductById = async function (req, res) {
 
 
 
-        const updatedProduct = await productModel.findOneAndUpdate({ _id: productId }, updateProductInfo, { new: true })
+        const updatedProduct = await ProductModel.findOneAndUpdate({ _id: productId }, updateProductInfo, { new: true })
 
         return res.status(200).send({ status: true, message: 'Success', data: updatedProduct });
 
@@ -369,7 +369,7 @@ const deleteProduct = async function(req,res){
     try {
         let productId = req.params.productId
 
-        if (!validator.validator.isValidObjectId(productId)) {
+        if (!validator.isValidObjectId(productId)) {
             return res.status(400).send({status:false,message:"Product Id is not correct"})
            }
 
