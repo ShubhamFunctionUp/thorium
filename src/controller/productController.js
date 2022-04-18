@@ -19,75 +19,128 @@ const validator = require('../validator/validator');
 // updatedAt: {timestamp},
 
 
+const isValid = function (value) {
+    if (typeof value == undefined || value == null) return false;
+    if (typeof value === "string" && value.trim().length === 0) return false;
+    return true;
+  };
+
+  const isBodyRequestValid = function (requestBody) {
+    return Object.keys(requestBody).length > 0
+  }
+
+  let isValidObjectId = function (objectId){
+    return mongoose.Types.ObjectId.isValid(objectId)
+}
+
+const isavailableSizesValid = function (availableSizes) {
+    return ["S", "XS","M","X", "L","XXL", "XL"].indexOf(availableSizes) !== -1
+  }
+
+  const isvalidNumber = function (value) {
+    if (typeof value === "Number") {
+      return true;
+    }
+}
+
+const isValidCurrencyFormat = function (currencyFormat) {
+    return ['₹'].indexOf(currencyFormat) !== -1
+}
+
+const isValidfiles = function (files) {
+    if (files && files.length > 0)
+        return true
+}
+
 // <------------------------- Creating Product-------------------------------------------->
     
-  const CreateProduct = async function (req, res){
-            try{
-        
-                
-                let requestBody = req.body
-                let files = req.files
-                if(!validator.isValidRequestBody(requestBody) && !validator.isValidRequestBody(files)){
-                    return res.status(400).send({status:false,msg:"No input provided"})
-                }
-        
-                let {title,description,price,currencyId,currencyFormat,productImage,availableSizes,installments} = requestBody
-                if(!validator.isValid(title)){
-                    return res.status(400).send({status:false,msg:"title is required"})
-                }
-        
-                const istitleUsed = await ProductModel.findOne({title})
-                if (istitleUsed) {
-                    return  res.status(400).send({status:false, msg:"title should be unique"})
-                    
-                }
-        
-                if(!validator.isValid(description)){
-                    return res.status(400).send({status:false,msg:"description is required"})
-                }
-        
-                if(!validator.isValid(price)){
-                    return res.status(400).send({status:false,msg:"price is required"})
-                }
-        
-                // if(!/^\d{0,8}(\.\d{1,2})?$/(price)){
-                //     return res.status(400).send({status:false,msg:"price should be  valid"})
-                // }
-        
-                if(!validator.isValid(currencyId)){
-                    return res.status(400).send({status:false,msg:"currencyId is required"})
-                }
-        
-                if(!validator.isValid(currencyFormat)){
-                    return res.status(400).send({status:false,msg:"currencyFormat is required"})
-                }
-        
-                if(!validator.isValidCurrencyFormat(currencyFormat)){
-                    return res.status(400).send({status:false,msg:"currencyFormat should be valid"})
-                }
-        
-                if(!validator.isValid(installments)){
-                    return res.status(400).send({status:false,msg:"installments should be in Number only"})
-                }
-        
-        
-                requestBody.productImage = await awsFile.uploadFile(files[0])
-                console.log(productImage)
-        
-                // if (!["Mr", "Mrs", "Miss"].includes(title)) {
-                //  return res.status(400).send({status: false,message: "enter valid title between Mr, Mrs, Miss",});
-                // }
-             
-                let Product = await ProductModel.create(requestBody)
-             return res.status(201).send({ status: true, message: 'Product created successfully', data: Product })
-        
-            }
-            catch(error){
-                return res.status(500).send({status:false,msg:error.msg})
-            }
+
+
+const CreateProduct = async function (req, res){
+    try{
+
+        let files = req.files
+        let requestBody = req.body
+       
+        if(!isBodyRequestValid(requestBody)){
+            return res.status(400).send({status:false,msg:"No input provided"})
         }
-        
-      
+
+        let {title,description,price,currencyId,currencyFormat,productImage,availableSizes,installments} = requestBody
+        if(!isValid(title)){
+            return res.status(400).send({status:false,msg:"title is required"})
+        }
+
+        const istitleUsed = await ProductModel.findOne({title})
+        if (istitleUsed) {
+            return  res.status(400).send({status:false, msg:"title should be unique"})
+            
+        }
+
+        if(!isValid(description)){
+            return res.status(400).send({status:false,msg:"description is required"})
+        }
+
+        if(!isValid(price)){
+            return res.status(400).send({status:false,msg:"price is required"})
+        }
+
+        // if(!/^\d{0,8}(\.\d{1,2})?$/(price)){
+        //     return res.status(400).send({status:false,msg:"price should be  valid"})
+        // }
+
+        if(!isValid(currencyId)){
+            return res.status(400).send({status:false,msg:"currencyId is required"})
+        }
+
+        if(!isValid(currencyFormat)){
+            return res.status(400).send({status:false,msg:"currencyFormat is required"})
+        }
+
+        if(!isValidCurrencyFormat(currencyFormat)){
+            return res.status(400).send({status:false,msg:"currencyFormat should be valid"})
+        }
+
+        if(!isValid(installments)){
+            return res.status(400).send({status:false,msg:"installments should be in Number only"})
+        }
+
+
+        requestBody.productImage = await awsFile.uploadFile(files[0])
+        console.log(productImage)
+
+        // if(!isavailableSizesValid(availableSizes)){
+        //     return res.status(400).send({status:false,msg:"availableSizes should be S, XS,M,X, L,XXL, XL"})
+        // }
+        if(availableSizes){
+        let array = []
+            //let newsize = availableSizes.split(" ").length
+
+            //converting string into array-
+            let SavailableSizes = availableSizes.split(",")
+            //console.log(newsize)
+            for (let i = 0; i < availableSizes.split(",").length; i++) {
+                // console.log(availableSizes[i])
+                array.push(SavailableSizes[i].toUpperCase())
+                console.log(array);
+                if (!(["S", "XS", "M", "X", "L", "XXL", "XL"].includes(array[i]))) {
+
+                    return res.status(400).send({ status: false, message: "Provide a valid size" })
+                }
+
+            }
+
+            
+            requestBody.availableSizes = array
+        }
+            let Product = await ProductModel.create(requestBody)
+     return res.status(201).send({ status: true, message: 'Product created successfully', data: Product })
+
+    }
+    catch(error){
+        return res.status(500).send({status:false,msg:error.msg})
+    }
+}    
 // <----------------------------  GET Product---------------------------------------------------------->
 
 
@@ -195,6 +248,121 @@ let getProductById = async function(req,res){
     }
 }
 
+
+
+// <-------------------------------------- Update Product------------------------------------------------------------------>
+const updateProductById = async function (req, res) {
+    try {
+        const data = req.body
+        const productId = req.params.productId
+
+        const checkProductId = await productModel.findOne({ _id: productId, isDeleted: false })
+
+        if (!checkProductId) {
+            return res.status(404).send({ status: false, msg: "Invalid product id" })
+        }
+        const { title, description, price, currencyId, currencyFormat, isFreeShipping, style, availableSizes, installments } = data;
+
+        const updateProductInfo = {}
+
+        const files = req.files
+
+        if (validator.isValidfiles(files)) {
+            const productImage = await awsS3.uploadFile(files[0])
+            updateProductInfo.productImage = productImage
+        }
+        if (validator.isValid(title)) {
+            const isTitleAlreadyUsed = await productModel.findOne({ title: title });
+            if (isTitleAlreadyUsed) {
+                return res.status(400).send({ status: false, msg: "title already exist" })
+            }
+            updateProductInfo.title = title
+        }
+        if (validator.isValid(description)) {
+            updateProductInfo.description = description
+        }
+
+        if (validator.isValid(price)) {
+            updateProductInfo.price = price
+        }
+
+        if (validator.isValid(currencyId)) {
+            updateProductInfo.currencyId = currencyId
+        }
+
+        if (validator.isValid(isFreeShipping)) {
+            updateProductInfo.isFreeShipping = isFreeShipping
+        }
+
+        if (validator.isValid(currencyFormat)) {
+            updateProductInfo.currencyFormat = currencyFormat
+        }
+
+        if (validator.isValid(style)) {
+            updateProductInfo.style = style
+        }
+
+
+        if (availableSizes) {
+
+            if (availableSizes.length === 0) {
+                return res.status(400).send({ status: false, msg: "Input product size" })
+            }
+            console.log(typeof (availableSizes.split(" ")));
+
+            let array = []
+            //let newsize = availableSizes.split(" ").length
+
+            //converting string into array-
+            let SavailableSizes = availableSizes.split(" ")
+            //console.log(newsize)
+            for (let i = 0; i < availableSizes.split(" ").length; i++) {
+                // console.log(availableSizes[i])
+                array.push(SavailableSizes[i].toUpperCase())
+                if (!(["S", "XS", "M", "X", "L", "XXL", "XL"].includes(array[i]))) {
+
+                    return res.status(400).send({ status: false, message: "Provide a valid size" })
+                }
+
+            }
+
+            updateProductInfo.availableSizes = array
+        }
+
+        if (validator.isValid(installments)) {
+            updateProductInfo.installments = installments
+        }
+
+
+
+        const updatedProduct = await productModel.findOneAndUpdate({ _id: productId }, updateProductInfo, { new: true })
+
+        return res.status(200).send({ status: true, message: 'Success', data: updatedProduct });
+
+    }
+    catch (error) {
+        return res.status(500).send({ status: false, message: error.message });
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // <--------------------------- Delete Product  ------------------------------------------------------>
 
 const deleteProduct = async function(req,res){
@@ -220,6 +388,7 @@ const deleteProduct = async function(req,res){
     }
 }
 
+module.exports.updateProductById = updateProductById;
 module.exports.getProducts=getProducts
 module.exports.deleteProduct = deleteProduct
 module.exports.getProductById = getProductById;

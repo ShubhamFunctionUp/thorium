@@ -5,6 +5,9 @@ const CartModel = require('../models/cartModel');
 const ProductModel = require('../models/ProductModel');
 const UserModel = require('../models/UserModel');
 
+
+// <-------------------------------- Create Cart------------------------------------------------------------------------------>
+
 const addToCart = async function(req,res){
     let userId = req.params.userId;
     let productId = req.body.items[0].productId;
@@ -54,7 +57,8 @@ const addToCart = async function(req,res){
                  userId:userId,
                  items:[{productId,quantity}],
                  totalPrice: quantity*price,
-                 totalItems:quantity     
+                 totalItems:quantity     ,
+                 totalQuantity:totalQuantity
              })
 
              return res.status(201).send({status:true,msg:"true",data:newUserCart})
@@ -66,10 +70,33 @@ const addToCart = async function(req,res){
     }
 }
 
+// <----------------------------- Get cart---------------------------------------------------------->
+
+const getCart = async function(req,res){
+    let user = req.params.userId;
+    
+  try {
+    let valueInsideCart = await CartModel.findOne({userId:user});
+    console.log(valueInsideCart);
+    if(valueInsideCart && valueInsideCart.items.length>0){
+        return res.status(200).send({status:false,msg:"true",data:valueInsideCart});
+    }else{
+        return res.status(400).send({status:false,msg:"true",data:"No value is present inside the cart of user"})
+    }
+  } catch (error) {
+     return res.status(500).send({msg:error.message}); 
+  }
+
+}
+
+
+// <-------------------------------------- Update Cart--------------------------------------------------------------------->
 
 const updateCart = async function(req,res){
+    
   let cartId = req.body.cartId;
   let productId = req.body.productId;
+  let removeProduct = req.body.removeProduct;    // 0 to remove all and 1 to decrement quantity by 1
     // console.log(productId);
   let isCartIdPresent = await cartModel.findOne({_id:cartId});
 //  console.log(isCartIdPresent);
@@ -86,8 +113,8 @@ const updateCart = async function(req,res){
     let price = isProductIdPresent.price;
 
     if(isCartIdPresent){
+        if(removeProduct==1){
     let findIndex = isCartIdPresent.items.findIndex((item)=>(item.productId == productId))
-
 
     if(findIndex>-1){
     let item = isCartIdPresent.items[findIndex];
@@ -100,13 +127,27 @@ const updateCart = async function(req,res){
     isCartIdPresent.totalItems = isCartIdPresent.totalItems - 1;
     isCartIdPresent.totalPrice = isCartIdPresent.totalPrice - price;
     isCartIdPresent.items[findIndex] = item;
-    let updatedCart = await cartModel.findByIdAndUpdate(cartId,isCartIdPresent,{new:true})
-    return res.status(200).send({status:true,msg:"true",data:updatedCart})
+    isCartIdPresent.save()
+    // let updatedCart = await cartModel.findByIdAndUpdate(cartId,isCartIdPresent,{new:true})
+    return res.status(200).send({status:true,msg:"true",data:isCartIdPresent})
 
     }else{
         return res.status(400).send({status:false,msg:"false",data:"Product is not present in cart or its already deleted"})
     }
-
+    }else if(removeProduct==0){
+        const itemIndex = isCartIdPresent.items.findIndex((item)=>(item.productId==productId));
+        if(itemIndex>-1){
+            let item = isCartIdPresent.items[itemIndex];
+            isCartIdPresent.totalItems = isCartIdPresent.totalItems - item.quantity;
+            isCartIdPresent.totalPrice = isCartIdPresent.totalPrice - item.quantity * isProductIdPresent.price;
+            isCartIdPresent.items.splice(itemIndex,1);
+            let cart = await isCartIdPresent.save();
+            return res.status(200).send({status:true,msg:"true",data:cart})
+        }else{
+            return res.status(400).send({status:false,msg:"false",data:"Product is not present in cart or its already deleted"})
+        }
+      
+    }
     }else{
         return res.status(400).send({status:false,msg:"false",data:"Cart is empty for the user"})
     }
@@ -114,6 +155,46 @@ const updateCart = async function(req,res){
 
 
 
+// <------------------------------------------ Delete Cart----------------------------------------------->
+
+
+const deleteCart = async function(req,res){
+    let userId = req.params.userId;
+    let productId = req.params.productId;
+    // let product = await ProductModel.findOne({_id:productId});
+   
+    try {
+        
+        let cartBson = await CartModel.findOne({userId:userId});
+        let cart = JSON.parse(JSON.stringify(cartBson));
+        // const itemIndex = cart.items.findIndex((item)=>(item.productId==productId));
+        
+        if(cart){
+            let item = [];
+            // cart.totalPrice = cart.totalPrice - item.quantity * item.price;
+            // if(item.totalPrice<0){
+            //     item.totalPrice = 0;
+            // }          
+
+            // cart.items.splice(itemIndex,1);
+            cart.items = item
+            cart.totalItems = 0
+            cart.totalPrice = 0;
+            // cart = await cart.save();
+            let deleteCart = await cartModel.findOneAndUpdate({ userId: userId }, { $set: { items: [], totalPrice: 0, totalItems: 0 } }, { new: true })
+            return res.status(200).send({status:"true",msg:"true",data:deleteCart})              
+        }else{
+            return res.status(404).send({status:false,data:"item not found"})
+        }
+
+    } catch (error) {
+        return res.status(500).send({msg:error.message})
+    }
+}
+
+
+module.exports.deleteCart =deleteCart
+module.exports.getCart=getCart
 module.exports.updateCart = updateCart
 module.exports.addToCart = addToCart
 
