@@ -7,11 +7,13 @@ const multer =require("multer")
 
 const app = express();
 app.use(multer().any())
+// support parsing of application/json type post data
 app.use(bodyParser.json());
+//support parsing of application/x-www-form-urlencoded post data -- when data we get from form
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-mongoose.connect("mongodb+srv://Pooja1010:JfnE38uRPOS0bajB@cluster0.zsuwb.mongodb.net/Product-Management", {
+mongoose.connect("mongodb+srv://Shubh9638464483:bI1LiqgUI6ov0Jhb@cluster0.azzwg.mongodb.net/groupDatabase12?retryWrites=true&w=majority", {
     useNewUrlParser: true
 })
 .then( () => console.log("MongoDb is connected"))

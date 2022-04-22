@@ -36,7 +36,7 @@ const authentication = async function(req, res, next){
 const authorization = async function(req, res, next){
     //const bearerHeader = req.headers['authentication'];
     const userId = req.params.userId
-    const   decodedtoken = jwt.verify( req.token, "secret key")
+    const decodedtoken = jwt.verify( req.token, "secret key")
 
     if(!isValidObjectId(userId)){
         return res.status(400).send({status :false , message : " enter a valid userId"})

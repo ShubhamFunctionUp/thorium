@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const bcrypt =require('bcrypt')
 const jwt = require('jsonwebtoken')
 const aws = require('../Aws/aws-s3')
+// <----------------------- Validation---------------------------------------->
 
 const isValid = function (value) {
     if (typeof value == undefined || value == null) return false;
@@ -23,6 +24,7 @@ const isValidfiles = function (files) {
         return true
 }
 
+// <------------------------------------- CREATE USER----------------------------------------------------->
 
 const createUser = async function(req,res){
   
@@ -149,6 +151,10 @@ const createUser = async function(req,res){
     }
 }
 
+
+// <--------------------------------- User Login---------------------------------------------------------------->
+
+
 const UserLogin = async function (req, res) {
     try {
         let data = req.body
@@ -201,6 +207,7 @@ const UserLogin = async function (req, res) {
         const token = jwt.sign({
             userId: emailMatch._id
         }, "secret key", { expiresIn: "30m" })
+        
         res.setHeader("x-api-key", token)
 
         return res.status(200).send({ status: true, msg: "User login successfull", userId: emailMatch._id, token })
@@ -209,6 +216,10 @@ const UserLogin = async function (req, res) {
         res.status(500).send({ status: false, msg: error.msg })
     }
 }
+
+
+
+// <------------------------------ GET USER---------------------------------------------------------------------->
 
 const getUser = async function(req,res){
    
@@ -238,6 +249,9 @@ const getUser = async function(req,res){
        return res.status(500).send({status:false,msg:err.message})
    }
 }
+
+
+// <---------------------------- UPDATE USER------------------------------------------------------>
 
 const UpdateUser = async function (req, res) {
     try{

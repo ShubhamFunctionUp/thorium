@@ -4,6 +4,8 @@ const UserModel = require('../Model/UserModel');
 const orderModel = require('../Model/OrderModel');
 const mongoose = require('mongoose')
 
+// <------------------------------ VALIDATION---------------------------------------------->
+
 const isValid = function (value) {
     if (typeof value === "undefined" || value === null) return false;
     if (typeof value === "string" && value.trim().length === 0) return false;
@@ -22,6 +24,9 @@ const isValid = function (value) {
     return  ["pending", "completed", "cancelled"].indexOf(statusQuery) !== -1
   }
 
+
+// <---------------------- CREATE ORDER------------------------------------------------->
+
 const createOrder = async function(req,res){
     let userId = req.params.userId;
     let items = req.body.items;    
@@ -39,8 +44,8 @@ const createOrder = async function(req,res){
 
         let requestBody = req.body;
        
-        let productId = req.body.items[0].productId;
-        let quantity = req.body.items[0].quantity;
+        let productId = req.body.productId;
+        let quantity = req.body.quantity;
 
         let {totalItems,totalPrice,totalQuantity} = req.body;
 
@@ -105,6 +110,7 @@ const createOrder = async function(req,res){
 
 }
 
+// <---------------------------------- UPDATE ORDER-------------------------------------------->
 
 const updateOrder = async function(req,res){
 

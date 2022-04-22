@@ -3,6 +3,8 @@ const UserModel = require('../Model/UserModel')
 const ProductModel = require('../Model/ProductModel')
 const mongoose = require('mongoose')
 
+// <-------------------------- VALIDATION------------------------------------->
+
 const isValid = function (value) {
     if (typeof value == undefined || value == null) return false;
     if (typeof value === "string" && value.trim().length === 0) return false;
@@ -19,6 +21,7 @@ const isValid = function (value) {
 }
 
              
+// <------------------------ ADD TO CART-------------------------------------------->
 
 const addToCart = async function(req,res){
     try {
@@ -118,6 +121,7 @@ const addToCart = async function(req,res){
     }
 }
 
+// <----------------------- UPDATE CART-------------------------------------------->
 
 const updateCart = async function(req,res){
     let requestBody = req.body
@@ -174,11 +178,14 @@ const updateCart = async function(req,res){
       let price = isProductIdPresent.price;
   
       if(isCartIdPresent){
+        //   decrement by 1 product
           if(removeProduct==1){
       let findIndex = isCartIdPresent.items.findIndex((item)=>(item.productId == productId))
   
+    //   it will find the index of element where productid present
   
       if(findIndex>-1){
+        //   it goes inside the cart and find out the index of productid if present
       let item = isCartIdPresent.items[findIndex];
       if(item.quantity == 1){
           return res.status(400).send({msg:"Product is cannot be less then one"})
@@ -196,7 +203,7 @@ const updateCart = async function(req,res){
           return res.status(400).send({status:false,msg:"Product is not present in cart or its already deleted"})
       }
     }else if(removeProduct==0){
-
+        // empty the 0
         const itemIndex = isCartIdPresent.items.findIndex((item)=>(item.productId==productId));
         if(itemIndex>-1){
             let item = isCartIdPresent.items[itemIndex];
@@ -204,7 +211,7 @@ const updateCart = async function(req,res){
             isCartIdPresent.totalPrice =0 
             isCartIdPresent.items = []
             
-            let cart = await isCartIdPresent.save();
+            let cart = await isCartIdPresent.save();     //Bson object ushko save karna hota after find
             return res.status(200).send({status:true,msg:"true",data:cart})
         }else{
             return res.status(400).send({status:false,msg:"false",data:"Product is not present in cart or its already deleted"})
@@ -216,7 +223,7 @@ const updateCart = async function(req,res){
       }
   }
 
-
+// <--------------------------GET CART------------------------------------------->
   const getCart = async function (req, res) {
 
     try {
@@ -249,6 +256,7 @@ const updateCart = async function(req,res){
 }
 
 
+// <----------------------------------- DELETE CART----------------------------------------------->
 
 const deleteCart = async function (req, res) {
 

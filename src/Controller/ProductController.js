@@ -2,7 +2,7 @@ const productModel = require('../Model/ProductModel')
 const awsS3 = require('../Aws/aws-s3')
 const mongoose = require('mongoose')
 
-
+// <--------------- VALIDATION ------------------------------------------------------->
 const isValid = function (value) {
     if (typeof value === "undefined" || value === null) return false;
     if (typeof value === "string" && value.trim().length === 0) return false;
@@ -24,7 +24,7 @@ const isValid = function (value) {
 
 
 
-//CreateProduct----------------------------
+//--------------------------------------------CreateProduct----------------------------
 
 
 const CreateProduct = async function (req, res) {
@@ -130,7 +130,7 @@ const CreateProduct = async function (req, res) {
 
 
 
-//GetProductByQuery---------------------------------
+//--------------------------------------------------GetProductByQuery---------------------------------
 
 const getProducts = async function (req, res) {
     let requestQuery = req.query;
@@ -146,7 +146,7 @@ const getProducts = async function (req, res) {
             if (!isValid(availableSizes) && availableSizes.length === 0) {
                 return res.status(400).send({ status: false, msg: "Please enter size" })
             } else {
-                obj.availableSizes = { $in: availableSizes.split(",") };
+                obj.availableSizes = { $in: availableSizes.split(",") };   // {$in:[M,XL,XLL]}
             }
         }
 
@@ -156,7 +156,7 @@ const getProducts = async function (req, res) {
                 return res.status(400).send({ status: false, mesage: "please enter valid name" })
             } else {
                 //    $regex is given by mongodb it will return whatever data pattern
-                obj.title = { $regex: name };
+                obj.title = { $regex: name };   //j.... m ....
             }
         }
 
@@ -198,7 +198,7 @@ const getProducts = async function (req, res) {
                 priceSort = -1;
             }
         }
-        //console.log(obj);
+        console.log(obj);
         let filterProduct = await productModel.find(obj).sort({ price: priceSort })
 
         if (filterProduct.length == 0) {
@@ -217,7 +217,7 @@ const getProducts = async function (req, res) {
 
 
 
-//GetProductById---------------------------------
+//-------------------------------------------------------GetProductById---------------------------------
 
 const getProductById = async function (req, res) {
     try {
@@ -246,7 +246,7 @@ const getProductById = async function (req, res) {
 
 
 
-//UpdateProduct-------------------------
+//---------------------------------------------------------UpdateProduct-------------------------
 
 
 const updateProductById = async function (req, res) {
@@ -353,7 +353,7 @@ const updateProductById = async function (req, res) {
 
 
 
-//DeleteProduct--------------------------------
+//---------------------------------------------------------DeleteProduct--------------------------------
 
 
 const deleteProduct = async function (req, res) {
