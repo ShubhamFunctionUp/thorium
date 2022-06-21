@@ -15,16 +15,16 @@ let options = {
 
 }
 
-
+// console.log("URLCONTROLLEL");
 
 //Connect to redis
 const redisClient = redis.createClient(
-    12672,
-  "redis-12672.c264.ap-south-1-1.ec2.cloud.redislabs.com",
+    12148,
+  "redis-12148.c17.us-east-1-4.ec2.cloud.redislabs.com",
   { no_ready_check: true }
 );
 
-redisClient.auth("BNxF5AmAM2GQBhfZzNgqsQ8x6C5lwywn", function (err) {
+redisClient.auth("0YS0AjHAu693z0XmnwlO2JvZ8uZAm2Ww", function (err) {
   if (err) throw err;
 });
 
@@ -75,7 +75,7 @@ const createUrlShorter = async function (req, res) {
 
            let url = await urlModel.findOne({longUrl:longUrl}).select({"createdAt":0,"updatedAt":0,"__v":0,"_id":0})
                if(url){
-                   return res.status(200).send({status:true,data:url})
+                   return res.status(200).redirect({status:true,data:url})
                }else{
          //   // const urlCode = shortid.generate().toLowerCase();
 
@@ -195,7 +195,7 @@ const getUrlCode = async function (req, res) {
             console.log("Hit");
             // res.redirect(cachedUrl)
             // console.log(cachedUrl);
-            res.redirect(JSON.parse(cachedUrl))
+            res.send(JSON.parse(cachedUrl))
             return
         //   res.send(cachedUrl)
         } else {
@@ -211,7 +211,7 @@ const getUrlCode = async function (req, res) {
         //   console.log(`${urlCode}`,getUrl.longUrl);
         //   res.redirect(`${urlCode}`)
          
-        return res.send({ data: urlCode });
+        return res.status(200).send({ data: urlCode });
 
 
         }
